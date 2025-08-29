@@ -20,14 +20,14 @@ export const typeKorean = {
 };
 
 export const imgOrder = {
-  back_default: 1,
-  back_female: 3,
-  back_shiny: 5,
-  back_shiny_female: 7,
-  front_default: 0,
-  front_female: 2,
-  front_shiny: 4,
-  front_shiny_female: 6,
+  back_default: { index: 1, name: "남" },
+  back_female: { index: 3, name: "여" },
+  back_shiny: { index: 5, name: "이로치 남" },
+  back_shiny_female: { index: 7, name: "이로치 여" },
+  front_default: { index: 0, name: "남" },
+  front_female: { index: 2, name: "여" },
+  front_shiny: { index: 4, name: "이로치 남" },
+  front_shiny_female: { index: 6, name: "이로치 여" },
 };
 
 export const searchTypes = {

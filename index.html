@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="./images/_con.ico" type="image/x-icon" />
     <title>Pokedex</title>
     <link rel="stylesheet" href="./styles/reset.css" />
     <link rel="stylesheet" href="./styles/style.css" />
@@ -17,26 +18,33 @@
           <option value="50">50</option>
           <option value="100">100</option>
         </select>
-        <select name="search-type" id="search-type" class="search-type">
-          <option value="id">도감 번호</option>
-          <option value="name">영어 이름</option>
-          <option value="korean-name">한글 이름</option>
-        </select>
-        <input
-          type="text"
-          id="pokemon-search-input"
-          placeholder="도감 번호 검색"
-        />
-        <button id="search-button">검색</button>
-        <button id="reset-button">초기화</button>
+        <form action="">
+          <select name="search-type" id="search-type" class="search-type">
+            <option value="id">도감 번호</option>
+            <option value="name">영어 이름</option>
+            <option value="korean-name">한글 이름</option>
+          </select>
+          <input
+            type="text"
+            id="pokemon-search-input"
+            name="search-value"
+            placeholder="도감 번호 검색"
+          />
+          <button id="search-button">검색</button>
+          <button id="reset-button">초기화</button>
+        </form>
       </div>
     </header>
 
     <main>
-      <div id="pokemon-list" class="pokemon-container"></div>
-      <div id="more-btn" class="more-btn"><button>더보기</button></div>
-      <div id="loading" class="loading">포켓몬 데이터를 불러오는 중...</div>
+      <section>
+        <div id="pokemon-list" class="pokemon-container"></div>
+        <div id="more-btn" class="more-btn"><button>더보기</button></div>
+        <div id="loading" class="loading">포켓몬 데이터를 불러오는 중...</div>
+      </section>
     </main>
+
+    <footer>Copyright &copy; 2025 HeoJieun. all rights reserved</footer>
 
     <script src="https://unpkg.com/pokeapi-js-wrapper/dist/index.js"></script>
     <!-- <script src="./js/default_value.js"></script> -->

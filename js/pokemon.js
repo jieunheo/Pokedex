@@ -160,9 +160,16 @@ async function openModal(name) {
     if (typeof pokemon.sprites[key] !== "string") return;
 
     console.log(key, pokemon.sprites[key]);
+    console.log(key, imgOrder[key]["name"]);
+
+    let htmlPrev = ``;
+    let htmlNext = ``;
+    if (key.indexOf("front") > -1)
+      htmlPrev = `<div><span>${imgOrder[key]["name"]}</span><div>`;
+    else htmlNext = `</div></div>`;
     imgArray[
-      imgOrder[key]
-    ] = `<img src="${pokemon.sprites[key]}" alt="${key}">`;
+      imgOrder[key].index
+    ] = `${htmlPrev}<img src="${pokemon.sprites[key]}" alt="${key}">${htmlNext}`;
   });
 
   const modalContainer = document.createElement("section");
@@ -193,7 +200,10 @@ async function openModal(name) {
     <div class="pokemon-image">
       <img src="${pokemon.sprites.front_default}" alt="${species.koreanName}">
     </div>
-    <div class="pokemon-info details-info">
+  `;
+  const infoData = document.createElement("div");
+  infoData.classList.add("pokemon-info", "details-info");
+  infoData.innerHTML = `
       <div class="details-info-line">
         <h3>타입</h3>
         <div class="pokemon-type">${species.typeArray.join("")}</div>
@@ -213,15 +223,16 @@ async function openModal(name) {
       <div class="details-info-line full-line">
         <h3>설명</h3>
         <p>${description}</p>
-      </div>
-    </div>
-  `;
+      </div>`;
 
   const imgs = document.createElement("div");
-  imgs.classList.add("info-imgs");
-  imgs.innerHTML = imgArray.join("");
+  imgs.classList.add("info-imgs", "details-info-line", "full-line");
+  imgs.innerHTML = `
+        <h3>모습</h3>
+        ${imgArray.join("")}`;
+  infoData.append(imgs);
 
-  modalInfo.append(imgs);
+  modalInfo.append(infoData);
   modal.append(modalHeader, modalInfo);
   modalContainer.append(modal);
   document.body.append(modalContainer);
