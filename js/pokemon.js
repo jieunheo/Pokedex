@@ -58,22 +58,6 @@ async function loadPokemonList() {
       data.forEach(async (item) => {
         // console.log(item);
         if (item && item.name) {
-          // const pokemon = await P.getPokemonByName(item.name);
-          // // console.log(pokemon);
-          // // 데이터가 없다면
-          // if (pokemon.id > 1025) {
-          //   // 관찰 요소 삭제
-          //   observer.unobserve(moreBtn);
-
-          //   // 더 보기 요소 가리기
-          //   moreBtn.style.display = "none";
-          //   loadingDiv.style.display = "none";
-
-          //   return;
-          // }
-
-          // // 포켓몬 종(species) 정보 가져오기 (한국어 이름을 위해)
-          // const species = await P.getPokemonSpeciesByName(item.name);
           const pokemonInfo = await getPokeminById(item.name);
 
           await makeCard(pokemonInfo);
@@ -247,9 +231,9 @@ async function openModal(name) {
 // 페이지 로드 시 포켓몬 데이터 불러오기
 document.addEventListener("DOMContentLoaded", async () => {
   const param = new URL(window.location.href).searchParams;
-  limit = param.get("limit");
+  limit = param.get("limit") ? param.get("limit") : 20;
 
-  searchLimit.value = limit || 20;
+  searchLimit.value = limit;
 
   await loadPokemonList();
 
