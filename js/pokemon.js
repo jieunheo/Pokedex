@@ -157,19 +157,27 @@ async function openModal(name) {
 
   const imgArray = [];
   Object.keys(pokemon.sprites).forEach((key) => {
-    if (typeof pokemon.sprites[key] !== "string") return;
+    // if (typeof pokemon.sprites[key] !== "string") return;
+    if (!Object.keys(imgOrder).includes(key)) return;
 
     console.log(key, pokemon.sprites[key]);
     console.log(key, imgOrder[key]["name"]);
 
     let htmlPrev = ``;
     let htmlNext = ``;
-    if (key.indexOf("front") > -1)
+    if (key.indexOf("front") > -1 && pokemon.sprites[key]) {
       htmlPrev = `<div><span>${imgOrder[key]["name"]}</span><div>`;
-    else htmlNext = `</div></div>`;
-    imgArray[
-      imgOrder[key].index
-    ] = `${htmlPrev}<img src="${pokemon.sprites[key]}" alt="${key}">${htmlNext}`;
+    } else {
+      htmlNext = `</div></div>`;
+    }
+
+    if (pokemon.sprites[key]) {
+      imgArray[
+        imgOrder[key].index
+      ] = `${htmlPrev}<img src="${pokemon.sprites[key]}" alt="${key}">${htmlNext}`;
+    } else if (key.indexOf("back") > -1 && !pokemon.sprites[key]) {
+      imgArray[imgOrder[key].index] = `${htmlNext}`;
+    }
   });
 
   const modalContainer = document.createElement("section");
