@@ -74,7 +74,7 @@ form {
   color: var(--main);
 }
 
-#pokemon-search-input {
+#search-input {
   padding: 10px;
   width: 300px;
   border: 1px solid #ddd;
