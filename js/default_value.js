@@ -25,7 +25,7 @@ export const imgOrder = {
   back_shiny: { index: 5, name: "이로치" },
   back_shiny_female: { index: 7, name: "이로치 암" },
   front_default: { index: 0, name: "기본" },
-  front_female: { index: 2, name: "임" },
+  front_female: { index: 2, name: "암" },
   front_shiny: { index: 4, name: "이로치" },
   front_shiny_female: { index: 6, name: "이로치 암" },
 };

@@ -36,6 +36,17 @@ h1 {
   color: var(--main);
 }
 
+.a11y-hidden {
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+}
+
 .search-container {
   display: flex;
   justify-content: space-between;
@@ -43,10 +54,13 @@ h1 {
 }
 
 form {
-  width: min(260px, 70%);
+  display: flex;
+  gap: 4px;
+  width: fit-content;
+  justify-content: end;
 }
 
-.search-limit {
+.filter-limit {
   padding: 10px 15px;
   border: 1px solid var(--main);
   border-radius: 5px;
@@ -90,7 +104,6 @@ button {
 #reset-button {
   background-color: var(--accent);
   color: white;
-  display: none;
 }
 #reset-button:hover {
   background-color: var(--accent-hover);
@@ -297,9 +310,19 @@ footer {
   overflow: hidden;
 }
 
-.modal-title {
+.modal-header {
   flex-direction: row;
   align-items: center;
+}
+
+.modal-header .name {
+  color: var(--main);
+  font-weight: 800;
+  font-size: 1.2rem;
+
+  order: 1;
+  flex-grow: 1;
+  text-align: center;
 }
 
 .close-btn {
@@ -313,7 +336,7 @@ footer {
   gap: 1rem;
 }
 
-.details-info h3 {
+.details-info h4 {
   margin-bottom: 0.5rem;
   font-weight: 700;
 }
@@ -327,4 +350,8 @@ footer {
 
 .full-line {
   width: 100%;
+}
+
+.details-info li {
+  width: 48%;
 }

@@ -12,39 +12,53 @@
     <header>
       <h1>포켓몬 도감</h1>
       <div class="search-container">
-        <select name="search-limit" id="search-limit" class="search-limit">
+        <h2 class="a11y-hidden">포켓몬 검색</h2>
+        <label class="a11y-hidden" for="filter-limit">로딩 개수</label>
+        <select name="filter-limit" id="filter-limit" class="filter-limit">
           <option value="10">10</option>
           <option value="20" selected>20</option>
           <option value="50">50</option>
           <option value="100">100</option>
         </select>
-        <form action="">
+        <form id="search-form" action="#">
+          <input
+            type="hidden"
+            name="search-limit"
+            value="20"
+            id="search-limit"
+          />
+          <label class="a11y-hidden" for="search-type">검색 타입</label>
           <select name="search-type" id="search-type" class="search-type">
             <option value="id">도감 번호</option>
-            <option value="name">영어 이름</option>
-            <option value="korean-name">한글 이름</option>
+            <option value="name">이름</option>
           </select>
+          <label class="a11y-hidden" for="search-input">도감 번호</label>
           <input
             type="text"
-            id="pokemon-search-input"
+            id="search-input"
             name="search-value"
             placeholder="도감 번호 검색"
+            required
           />
-          <button id="search-button">검색</button>
-          <button id="reset-button">초기화</button>
+          <button type="submit" id="search-button">검색</button>
+          <button type="button" id="reset-button">초기화</button>
         </form>
       </div>
     </header>
 
     <main>
       <section>
+        <h2 class="a11y-hidden">포켓몬 목록</h2>
         <div id="pokemon-list" class="pokemon-container"></div>
         <div id="more-btn" class="more-btn"><button>더보기</button></div>
         <div id="loading" class="loading">포켓몬 데이터를 불러오는 중...</div>
       </section>
     </main>
 
-    <footer>Copyright &copy; 2025 HeoJieun. all rights reserved</footer>
+    <footer>
+      <h2 class="a11y-hidden">제작자 정보</h2>
+      <div>Copyright &copy; 2025 HeoJieun. all rights reserved</div>
+    </footer>
 
     <script src="https://unpkg.com/pokeapi-js-wrapper/dist/index.js"></script>
     <!-- <script src="./js/default_value.js"></script> -->
