@@ -10,7 +10,6 @@ const filterLimit = document.getElementById("filter-limit");
 const searchLimit = document.getElementById("search-limit");
 const searchType = document.getElementById("search-type");
 const searchInput = document.getElementById("search-input");
-const searchBtn = document.getElementById("search-button");
 const resetBtn = document.getElementById("reset-button");
 const loadingDiv = document.getElementById("loading");
 
@@ -126,18 +125,8 @@ async function getPokeminById(name) {
       // 포켓몬 종(species) 정보 가져오기 (한국어 이름을 위해)
       const species = await P.getPokemonSpeciesByName(name);
 
-      // 한국어 이름 찾기
-      const koreanName =
-        species.names.find((name) => name.language.name === "ko")?.name ||
-        pokemon.name;
+      const { koreanName, typeArray } = findInfo(species, pokemon);
       species.koreanName = koreanName;
-
-      // 타입 정보 가져오기
-      const types = pokemon.types.map((type) => type.type.name);
-      const typeArray = [];
-      types.forEach((type) => {
-        typeArray.push(`<p class="type-${type}">${typeKorean[type]}</p>`);
-      });
       species.typeArray = typeArray;
 
       return { pokemon, species };
@@ -305,18 +294,8 @@ async function searchPokemonByEnglishName(name) {
     // 포켓몬 종 정보도 가져오기
     const species = await P.getPokemonSpeciesByName(pokemon.id);
 
-    // 한국어 이름 찾기
-    const koreanName =
-      species.names.find((name) => name.language.name === "ko")?.name ||
-      pokemon.name;
+    const { koreanName, typeArray } = findInfo(species, pokemon);
     species.koreanName = koreanName;
-
-    // 타입 정보 가져오기
-    const types = pokemon.types.map((type) => type.type.name);
-    const typeArray = [];
-    types.forEach((type) => {
-      typeArray.push(`<p class="type-${type}">${typeKorean[type]}</p>`);
-    });
     species.typeArray = typeArray;
 
     // 결과 표시
@@ -336,50 +315,6 @@ async function searchPokemonByEnglishName(name) {
   }
 }
 
-// 한국어 이름 매핑을 저장할 객체
-const koreanNameMap = new Map();
-let mappingPage = 1;
-// 한국어 이름 매핑 데이터 구축하기
-async function buildKoreanNameMap(limit = 300) {
-  try {
-    console.log("한국어 이름 데이터 로딩 중...");
-
-    // 포켓몬 목록 가져오기
-    // const response = await P.getPokemonsList({ limit: limit });
-
-    const offset = (mappingPage - 1) * limit;
-    const response = await P.getPokemonsList({
-      offset: offset,
-      limit: limit,
-    });
-
-    // 각 포켓몬의 종 정보 가져오기
-    for (const pokemon of response.results) {
-      const species = await P.getPokemonSpeciesByName(pokemon.name);
-
-      // 한국어 이름 찾기
-      const koreanName = species.names.find(
-        (name) => name.language.name === "ko"
-      )?.name;
-
-      if (koreanName) {
-        // 한국어 이름 -> 영어 이름/ID 매핑 저장
-        koreanNameMap.set(koreanName.toLowerCase(), {
-          id: species.id,
-          englishName: pokemon.name,
-        });
-      }
-    }
-
-    console.log(`총 ${koreanNameMap.size}개의 한국어 이름 매핑 완료`);
-
-    return offset;
-  } catch (error) {
-    console.error("한국어 이름 데이터 로드 오류:", error);
-    // buildKoreanNameMap();
-  }
-}
-
 // 한글 이름으로 포켓몬 검색하기
 async function searchPokemonByKoreanName(koreanName) {
   try {
@@ -394,18 +329,8 @@ async function searchPokemonByKoreanName(koreanName) {
       const pokemon = await P.getPokemonByName(pokemonInfo.id);
       const species = await P.getPokemonSpeciesByName(pokemonInfo.id);
 
-      // 한국어 이름 찾기
-      const koreanName =
-        species.names.find((name) => name.language.name === "ko")?.name ||
-        pokemon.name;
+      const { koreanName, typeArray } = findInfo(species, pokemon);
       species.koreanName = koreanName;
-
-      // 타입 정보 가져오기
-      const types = pokemon.types.map((type) => type.type.name);
-      const typeArray = [];
-      types.forEach((type) => {
-        typeArray.push(`<p class="type-${type}">${typeKorean[type]}</p>`);
-      });
       species.typeArray = typeArray;
 
       // 결과 표시
@@ -428,15 +353,60 @@ async function searchPokemonByKoreanName(koreanName) {
   }
 }
 
+// 한국어 이름 매핑을 저장할 객체
+const koreanNameMap = new Map();
+// 한국어 이름 매핑 데이터 구축하기
+async function buildKoreanNameMap(limit = 2000) {
+  try {
+    console.log("한국어 이름 데이터 로딩 중...");
+
+    // 포켓몬 목록 가져오기
+    const allPokemonList = await P.getPokemonsList({ limit: limit });
+
+    // Promise.allSettled를 사용하여 개별 species 요청 실패 시에도 전체 중단 방지
+    const speciesPromises = allPokemonList.results.map((pokemon) =>
+      P.getPokemonSpeciesByName(pokemon.name).catch((error) => {
+        // 개별 species 요청에서 발생한 오류 처리
+        console.warn(`종 정보 로드 실패 for ${pokemon.name}:`, error);
+        return null; // 실패한 경우 null 반환
+      })
+    );
+
+    // 각 포켓몬의 종 정보 가져오기
+    const allSpeciesData = await Promise.allSettled(speciesPromises);
+    allSpeciesData.forEach((result) => {
+      if (result.status === "fulfilled" && result.value) {
+        // 성공적으로 데이터 가져온 경우만
+        const species = result.value;
+        const koreanName = species.names.find(
+          (name) => name.language.name === "ko"
+        )?.name;
+        if (koreanName) {
+          koreanNameMap.set(koreanName.toLowerCase(), {
+            id: species.id,
+            englishName: species.name,
+          });
+        }
+      }
+    });
+
+    console.log(`총 ${koreanNameMap.size}개의 한국어 이름 매핑 완료`);
+
+    return;
+  } catch (error) {
+    console.error("한국어 이름 데이터 로드 오류:", error);
+  } finally {
+    console.log(koreanNameMap);
+  }
+}
+
 // 통합 검색 함수
-async function searchPokemon(query) {
+async function searchPokemon(searchValue) {
   if (isLoading || isSearching) return;
   isSearching = true;
 
-  resetBtn.style.display = "block";
-
   // 검색어가 비어있으면 중단
-  if (!query.trim()) {
+  if (!searchValue.trim()) {
     alert("검색어를 입력해주세요.");
     return;
   }
@@ -447,21 +417,18 @@ async function searchPokemon(query) {
   try {
     // 1. 숫자인지 확인 (ID 검색)
     if (searchType.value === "id") {
-      await searchPokemonById(parseInt(query));
+      await searchPokemonById(parseInt(searchValue));
       return;
     }
 
     // 2. 한국어 이름으로 검색
-    if (
-      koreanNameMap.has(query.toLowerCase()) ||
-      searchType.value === "korean-name"
-    ) {
-      await searchPokemonByKoreanName(query);
+    if (koreanNameMap.has(searchValue.toLowerCase())) {
+      await searchPokemonByKoreanName(searchValue);
       return;
     }
 
     // 3. 영어 이름으로 검색
-    await searchPokemonByEnglishName(query);
+    await searchPokemonByEnglishName(searchValue);
   } catch (error) {
     alert(
       "검색 결과가 없습니다. 포켓몬 번호, 한글 이름 또는 영어 이름을 입력해주세요."
@@ -474,20 +441,21 @@ async function searchPokemon(query) {
 document.addEventListener("DOMContentLoaded", async () => {
   getParam();
 
+  await buildKoreanNameMap();
+
   if (!searchValue) {
     await loadPokemonList();
 
     // 2초 후 인식하기
     setTimeout(() => observer.observe(moreBtn), 2000);
   } else {
-    searchPokemon(searchValue);
+    await searchPokemon(searchValue);
   }
+});
 
-  let offset = await buildKoreanNameMap();
-  for (mappingPage; offset < 1025; mappingPage++) {
-    offset = await buildKoreanNameMap();
-  }
-  console.log(koreanNameMap);
+// 클릭시 상세 페이지
+pokemonListDiv.addEventListener("click", (e) => {
+  openModal(e.target.dataset.name);
 });
 
 // more 버튼을 눌러도 리스트 가져올 수 있도록
@@ -495,14 +463,18 @@ moreBtn.addEventListener("click", async () => {
   await loadPokemonList();
 });
 
+// 리스트 리밋 필터
 filterLimit.addEventListener("change", async () => {
   history.pushState(null, null, `?limit=${filterLimit.value}`);
 
-  reset();
   getParam();
+
   await loadPokemonList();
+
+  observer.observe(moreBtn);
 });
 
+// 검색 타입 설정
 searchType.addEventListener("change", () => {
   searchInput.placeholder = searchTypes[searchType.value] + "  검색";
 
@@ -517,16 +489,14 @@ searchType.addEventListener("change", () => {
   }
 });
 
-pokemonListDiv.addEventListener("click", (e) => {
-  openModal(e.target.dataset.name);
-});
-
+// 검색
 searchForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  searchPokemon(searchInput.value);
+  await searchPokemon(searchInput.value);
 });
 
+// 초기화
 resetBtn.addEventListener("click", async () => {
   window.location = window.location.pathname;
   reset();
@@ -534,6 +504,7 @@ resetBtn.addEventListener("click", async () => {
   await loadPokemonList();
 });
 
+// 초기화 함수
 function reset() {
   pokemonListDiv.innerHTML = "";
 
@@ -550,7 +521,10 @@ function reset() {
   loadingDiv.style.display = "block";
 }
 
+// 파라미터 가져오기
 function getParam() {
+  reset();
+
   const param = new URL(window.location.href).searchParams;
 
   limit = param.get("limit") ? param.get("limit") : 20;
@@ -574,6 +548,7 @@ function getParam() {
   }
 }
 
+// 파라미터 설정하기
 function setParam() {
   let params = `?`;
 
@@ -585,4 +560,25 @@ function setParam() {
     params += `${params ? "&" : ""}search-value=${searchInput.value}`;
 
   history.pushState(null, null, params);
+}
+
+function findInfo(species, pokemon) {
+  // 한국어 이름 찾기
+  const koreanName =
+    species.names.find((name) => name.language.name === "ko")?.name ||
+    pokemon.name;
+  species.koreanName = koreanName;
+
+  // 타입 정보 가져오기
+  const types = pokemon.types.map((type) => type.type.name);
+  const typeArray = [];
+  types.forEach((type) => {
+    typeArray.push(`<p class="type-${type}">${typeKorean[type]}</p>`);
+  });
+  species.typeArray = typeArray;
+
+  return {
+    koreanName,
+    typeArray,
+  };
 }
