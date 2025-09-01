@@ -104,6 +104,7 @@ button {
 #reset-button {
   background-color: var(--accent);
   color: white;
+  flex-shrink: 0;
 }
 #reset-button:hover {
   background-color: var(--accent-hover);
