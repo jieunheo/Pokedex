@@ -527,7 +527,7 @@ searchForm.addEventListener("submit", async (e) => {
 });
 
 resetBtn.addEventListener("click", async () => {
-  window.location = "/";
+  window.location = window.location.pathname;
   reset();
 
   await loadPokemonList();
