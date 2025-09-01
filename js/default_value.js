@@ -32,6 +32,6 @@ export const imgOrder = {
 
 export const searchTypes = {
   id: "도감 번호",
-  name: "영어 이름",
+  name: "이름",
   "korean-name": "한글 이름",
 };
