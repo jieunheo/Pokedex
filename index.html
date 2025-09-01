@@ -52,6 +52,12 @@
             value="20"
             id="search-limit"
           />
+          <input
+            type="hidden"
+            name="search-filter-type"
+            value=""
+            id="search-filter-type"
+          />
           <label class="a11y-hidden" for="search-type">검색 타입</label>
           <select name="search-type" id="search-type" class="search-type">
             <option value="id">도감 번호</option>
@@ -68,6 +74,10 @@
           <button type="submit" id="search-button">검색</button>
           <button type="button" id="reset-button">초기화</button>
         </form>
+        <div>
+          <h3 class="a11y-hidden">포켓몬 타입 검색</h3>
+          <ul id="type-filter" class="type-filter"></ul>
+        </div>
       </div>
     </header>
 

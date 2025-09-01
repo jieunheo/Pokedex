@@ -49,6 +49,7 @@ h1 {
 
 .search-container {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 10px;
 }
@@ -108,6 +109,51 @@ button {
 }
 #reset-button:hover {
   background-color: var(--accent-hover);
+}
+
+.type-filter {
+  width: 100%;
+  padding: 1rem;
+
+  display: flex;
+  gap: 0.5rem;
+}
+
+.type-filter:hover {
+  overflow-y: hidden;
+  overflow-x: scroll;
+}
+
+.type-item {
+  width: 3rem;
+  height: 3rem;
+  padding: 0.2rem;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--line-color);
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.type-item:hover {
+  outline: 2px solid var(--main-hover);
+}
+
+.type-item.active {
+  outline: 2px solid var(--accent);
+}
+
+.type-item button {
+  padding: 0;
+}
+
+.type-item img {
+  width: 100%;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+
+  pointer-events: none;
+  -webkit-user-select: none; /* Chrome/Safari 이미지가 선택되지 않도록*/
 }
 
 .pokemon-container {

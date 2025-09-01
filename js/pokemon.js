@@ -8,8 +8,10 @@ const pokemonListDiv = document.getElementById("pokemon-list");
 const searchForm = document.getElementById("search-form");
 const filterLimit = document.getElementById("filter-limit");
 const searchLimit = document.getElementById("search-limit");
+const searchFilterType = document.getElementById("search-filter-type");
 const searchType = document.getElementById("search-type");
 const searchInput = document.getElementById("search-input");
+const typeFilter = document.getElementById("type-filter");
 const resetBtn = document.getElementById("reset-button");
 const loadingDiv = document.getElementById("loading");
 
@@ -47,27 +49,28 @@ async function loadPokemonList() {
 
   try {
     // 시작 ID부터 count개의 포켓몬 데이터를 가져오기
-    // for (let i = startId; i < startId + limit; i++) {
-    const interval = {
-      offset: offset,
-      limit: limit,
-    };
-    P.getPokemonsList(interval).then(function (response) {
-      // console.log(response);
-      // 포켓몬 기본 정보 가져오기
-      const data = response.results;
-      // console.log(data);
+    if (searchFilterType.value === "") {
+      const interval = {
+        offset: offset,
+        limit: limit,
+      };
+      P.getPokemonsList(interval).then(function (response) {
+        // console.log(response);
+        // 포켓몬 기본 정보 가져오기
+        const data = response.results;
+        // console.log(data);
 
-      // 값 뿌려주기
-      data.forEach(async (item) => {
-        // console.log(item);
-        if (item && item.name) {
-          const pokemonInfo = await getPokeminById(item.name);
+        // 값 뿌려주기
+        data.forEach(async (item) => {
+          // console.log(item);
+          if (item && item.name) {
+            const pokemonInfo = await getPokeminById(item.name);
 
-          await makeCard(pokemonInfo);
-        }
+            await makeCard(pokemonInfo);
+          }
+        });
       });
-    });
+    }
 
     currentPage++;
   } catch (error) {
@@ -229,6 +232,23 @@ async function openModal(name) {
       <div class="details-info-line full-line">
         <h4>설명</h4>
         <p>${description}</p>
+      </div>
+      <div class="details-info-line full-line">
+        <h4>능력치</h4>
+        <p>${pokemon.stats
+          .map((stat) => `<li>${stat.stat.name}: ${stat.base_stat}</li>`)
+          .join("")}</p>
+      </div>
+      <div class="details-info-line full-line">
+        <h4>특성</h4>
+        <p>${pokemon.abilities
+          .map(
+            (ability) =>
+              `<li>${ability.ability.name}${
+                ability.is_hidden ? " (숨겨진 특성)" : ""
+              }</li>`
+          )
+          .join("")}</p>
       </div>`;
 
   const imgs = document.createElement("div");
@@ -451,6 +471,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   } else {
     await searchPokemon(searchValue);
   }
+
+  for (const type in typeKorean) {
+    if (Object.prototype.hasOwnProperty.call(typeKorean, type)) {
+      const element = typeKorean[type];
+      console.log(element);
+
+      const li = document.createElement("li");
+      li.classList.add("type-item");
+      li.dataset.type = type;
+      li.innerHTML = `<img src="../images/${type}_icon.png" alt="${element} 타입">`;
+      typeFilter.append(li);
+    }
+  }
 });
 
 // 클릭시 상세 페이지
@@ -502,6 +535,21 @@ resetBtn.addEventListener("click", async () => {
   reset();
 
   await loadPokemonList();
+});
+
+typeFilter.addEventListener("click", (e) => {
+  e.stopPropagation();
+  if (e.target.classList.contains("type-item") === false) return;
+
+  const item = e.target;
+  if (item.classList.contains("active")) {
+    item.classList.remove("active");
+  } else {
+    typeFilter
+      .querySelectorAll("li")
+      .forEach((li) => li.classList.remove("active"));
+    item.classList.add("active");
+  }
 });
 
 // 초기화 함수
