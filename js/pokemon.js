@@ -440,8 +440,9 @@ async function searchPokemon(query) {
     alert("검색어를 입력해주세요.");
     return;
   }
-  reset();
-  getParam();
+
+  pokemonListDiv.innerHTML = "";
+  setParam();
 
   try {
     // 1. 숫자인지 확인 (ID 검색)
@@ -571,4 +572,17 @@ function getParam() {
     searchInput.min = "";
     searchInput.max = "";
   }
+}
+
+function setParam() {
+  let params = `?`;
+
+  if (filterLimit.value) params += `limit=${filterLimit.value}`;
+
+  if (searchType.value)
+    params += `${params ? "&" : ""}search-type=${searchType.value}`;
+  if (searchInput.value)
+    params += `${params ? "&" : ""}search-value=${searchInput.value}`;
+
+  history.pushState(null, null, params);
 }
