@@ -494,12 +494,12 @@ moreBtn.addEventListener("click", async () => {
   await loadPokemonList();
 });
 
-filterLimit.addEventListener("change", () => {
+filterLimit.addEventListener("change", async () => {
   history.pushState(null, null, `?limit=${filterLimit.value}`);
 
   reset();
-  loadPokemonList();
   getParam();
+  await loadPokemonList();
 });
 
 searchType.addEventListener("change", () => {
