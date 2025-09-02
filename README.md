@@ -78,6 +78,9 @@
 메인 화면
 
 ![desktop](./images/readme/desktop_main_01.png)
+
+상세 모달
+
 ![desktop](./images/readme/desktop_main_02.png)
 
 검색 화면
@@ -194,3 +197,6 @@
    이번에는 meta값에 대해 검색을 해보면서 적용하는 것도 해봤다.
    meta 값을 잘 입력해야 검색엔진이 해당 사이트를 잘 파악할 수 있다는 것을 알았다.
    파비콘 뿐 아니라 title이나 description, url, image 등의 여러가지 값을 넣어보았다.
+
+   이런 것을 신경써서 작업하는 것이 꽤나 헷갈리고 어렵다는 생각이 들었다.
+   실무에서도 중요한 부분일 거 같아 앞으로도 신경 잘 써야겠다.
