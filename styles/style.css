@@ -156,6 +156,10 @@ button {
   -webkit-user-select: none; /* Chrome/Safari 이미지가 선택되지 않도록*/
 }
 
+main {
+  min-height: 79vh;
+}
+
 .pokemon-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));

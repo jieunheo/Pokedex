@@ -50,6 +50,29 @@ async function loadPokemonList() {
   try {
     // 시작 ID부터 count개의 포켓몬 데이터를 가져오기
     if (searchFilterType.value === "") {
+      // 전체 리스트를 가져오는 경우
+      const interval = {
+        offset: offset,
+        limit: limit,
+      };
+      P.getPokemonsList(interval).then(function (response) {
+        // console.log(response);
+        // 포켓몬 기본 정보 가져오기
+        const data = response.results;
+        // console.log(data);
+
+        // 값 뿌려주기
+        data.forEach(async (item) => {
+          // console.log(item);
+          if (item && item.name) {
+            const pokemonInfo = await getPokeminById(item.name);
+
+            await makeCard(pokemonInfo);
+          }
+        });
+      });
+    } else {
+      // 타입별 리스트를 가져오는 경우
       const interval = {
         offset: offset,
         limit: limit,
@@ -416,7 +439,7 @@ async function buildKoreanNameMap(limit = 2000) {
   } catch (error) {
     console.error("한국어 이름 데이터 로드 오류:", error);
   } finally {
-    console.log(koreanNameMap);
+    // console.log(koreanNameMap);
   }
 }
 
@@ -474,13 +497,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   for (const type in typeKorean) {
     if (Object.prototype.hasOwnProperty.call(typeKorean, type)) {
-      const element = typeKorean[type];
-      console.log(element);
-
       const li = document.createElement("li");
       li.classList.add("type-item");
       li.dataset.type = type;
-      li.innerHTML = `<img src="../images/${type}_icon.png" alt="${element} 타입">`;
+      li.innerHTML = `<img src="${window.location.pathname}images/${type}_icon.png" alt="${typeKorean[type]} 타입">`;
       typeFilter.append(li);
     }
   }
@@ -537,19 +557,27 @@ resetBtn.addEventListener("click", async () => {
   await loadPokemonList();
 });
 
-typeFilter.addEventListener("click", (e) => {
+// 타입 필터
+typeFilter.addEventListener("click", async (e) => {
   e.stopPropagation();
   if (e.target.classList.contains("type-item") === false) return;
 
   const item = e.target;
   if (item.classList.contains("active")) {
     item.classList.remove("active");
+    searchFilterType.value = "";
   } else {
     typeFilter
       .querySelectorAll("li")
       .forEach((li) => li.classList.remove("active"));
     item.classList.add("active");
+    searchFilterType.value = item.dataset.type;
   }
+
+  setParam();
+  getParam();
+
+  await loadPokemonList();
 });
 
 // 초기화 함수
@@ -563,6 +591,7 @@ function reset() {
   filterLimit.value = limit;
   searchLimit.value = limit;
   searchInput.value = searchValue;
+  searchFilterType.value = "";
 
   // 더 보기 요소 보이기
   moreBtn.style.display = "block";
@@ -602,6 +631,10 @@ function setParam() {
 
   if (filterLimit.value) params += `limit=${filterLimit.value}`;
 
+  if (searchFilterType.value)
+    params += `${params ? "&" : ""}search-filter-type=${
+      searchFilterType.value
+    }`;
   if (searchType.value)
     params += `${params ? "&" : ""}search-type=${searchType.value}`;
   if (searchInput.value)
